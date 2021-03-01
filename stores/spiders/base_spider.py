@@ -16,9 +16,9 @@ class BaseSpider(scrapy.Spider):
         return spider_list.index(f"{name}.py") + 1
 
     def __init__(self):
-        pos = self.get_spider_position(self.name)
+        self.pos = self.get_spider_position(self.name)
 
-    def set_progress_bar(page_count):
+    def init_progress_bar(self, page_count):
         self.pbar = tqdm(total=page_count, desc=f'{self.name} pos={self.pos})')
 
     @classmethod
@@ -35,7 +35,7 @@ class BaseSpider(scrapy.Spider):
 
     #### PARSE ####
     def parse(self, response):
-        results = [] if response.status != 200 else parse_store(response)
+        results = [] if response.status != 200 else self.parse_store(response)
         item = self.create_item(results, response)
 
         return item
@@ -47,13 +47,13 @@ class BaseSpider(scrapy.Spider):
         item["url"] = response.url
         item["date"] = time.strftime("%Y-%m-%d")
         item["timestamp"] = int(time.time())
-        item['error'] = response.body.decode() if response.status != 200 else None
+        item['error'] = response.body.decode() if response.status != 200 else None
 
         #Convert items to dicts
         if results:
-            for i, item in enumerate(results):
-                results[i] = dict(item)
+            for i, result in enumerate(results):
+                results[i] = dict(result)
 
-        item.update(results)
+        item['results'] = results
 
         return item

@@ -8,7 +8,7 @@ from stores.db import insert_rows
 
 class StoresPipeline:
 
-    def get_rows(item):
+    def get_rows(self, item):
         """Format item to fit table columns"""
         return [
             [
@@ -19,7 +19,7 @@ class StoresPipeline:
                 result['city'],
                 item['date'],
             ]
-            for result in item[results]
+            for result in item['results']
         ]
 
     def process_item(self, item, spider):

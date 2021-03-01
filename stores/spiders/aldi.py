@@ -8,9 +8,9 @@ from stores.spiders.base_spider import BaseSpider
 from stores.items import StoresItem
 
 
-class StoresSpider(scrapy.Spider):
+class AldiSpider(BaseSpider):
     name = 'aldi'
-    url = 'https://www.yellowmap.de/partners/AldiNord/Html/Poi.aspx?SessionGuid=79eddb93-19c2-4b1b-aa05-fbd9501a4f50&View=4&ClearGroups=MapNav,GeoMap&Page={}&ClearParas=PoiListPageSize&Step='
+    url = 'https://www.yellowmap.de/partners/AldiNord/Html/Poi.aspx?SessionGuid=effc178a-0801-445b-9912-99e48144765f&View=4&ClearGroups=MapNav,GeoMap&Page={}&ClearParas=PoiListPageSize&Step='
     store_per_page = 5
 
 
@@ -18,14 +18,16 @@ class StoresSpider(scrapy.Spider):
 
         url = self.url.format(1)
         request = requests.get(url)
-        response = scrapy.http.TextResponse(url, body=request.text.encode())
-        self.parse(response)
 
         parser = BeautifulSoup(request.text, 'html.parser')
         elem = parser.select_one('div.PoiListBrowseControlUp strong')
         page_count = math.ceil(int(elem.text) / self.store_per_page)
+        self.init_progress_bar(page_count - 1)
 
-        for i in range(2, page_count):
+        response = scrapy.http.TextResponse(url, body=request.text.encode())
+        self.parse(response)
+
+        for i in range(2, page_count + 1):
             r = scrapy.Request(
                 url=self.url.format(i),
                 callback=self.parse,
@@ -35,24 +37,32 @@ class StoresSpider(scrapy.Spider):
             yield r
 
 
-    def parse_store(self, response):
-
+    def get_results(self, response, store_sel):
         name_sel = './/p[@class="PoiListItemTitle"]/text()'
         address_sel = './/address/text()'
         city_sel = './/address/text()[2]'
-        store_sel = '//tr[@class="ItemTemplate"]'
-        stores = response.xpath(store_sel)
 
         results = []
         result = StoresItem()
+        stores = response.xpath(store_sel)
         for store in stores:
             city = store.xpath(city_sel).extract_first()
 
             result['name'] = store.xpath(name_sel).extract_first()
             result['address'] = store.xpath(address_sel).extract_first()
             result['zipcode'] = city.split()[0]
-            result['city'] = city.split()[1].strip()
+            result['city'] = city.split(' ', 1)[1].strip()
 
             results.append(result.copy())
+
+        return results
+
+
+    def parse_store(self, response):
+        store_sel1 = '//tr[@class="ItemTemplate"]'
+        store_sel2 = '//tr[@class="AlternatingItemTemplate"]'
+
+        results = self.get_results(response, store_sel1)
+        results += self.get_results(response, store_sel2)
 
         return results

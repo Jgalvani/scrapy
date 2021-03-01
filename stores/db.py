@@ -4,6 +4,7 @@ import MySQLdb.cursors
 import os
 
 from scrapy.exceptions import CloseSpider
+from urllib.parse import urlparse
 
 dotenv.load_dotenv()
 
@@ -36,7 +37,7 @@ def insert_rows(rows):
 
     # Query definition
     print('Updating table "stores"...')
-    table1_query = """
+    query = """
         INSERT INTO stores
             (store, name, address, zipcode, city, date)
         VALUES
@@ -45,14 +46,14 @@ def insert_rows(rows):
         ON DUPLICATE KEY UPDATE
             store       = store,
             name        = name,
-            address     = addrees,
+            address     = address,
             zipcode     = zipcode,
             city        = city,
             date        = date
     """
 
     # Query execution
-    cursor.execute_many(table1_query, rows)
+    cursor.executemany(query, rows)
     print('Results inserted!')
 
     cursor.close()
