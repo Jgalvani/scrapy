@@ -3,29 +3,38 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
-
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from stores.db import insert_rows
 
 
 class StoresPipeline:
 
-    def process_item(self, row, spider):
+    def get_rows(item):
+        """Format item to fit table columns"""
+        return [
+            [
+                item['store'],
+                result['name'],
+                result['address'],
+                result['zipcode'],
+                result['city'],
+                item['date'],
+            ]
+            for result in item[results]
+        ]
 
-        table = os.environ["TABLE"]
+    def process_item(self, item, spider):
 
-        if not row['results']:
-            row['results'] == []
+        if not item['results']:
+            item['results'] == []
 
-        #MYSQL
-        #errors = bigquery_client.insert_rows_json(table, [item])
+        rows = self.get_rows(item)
+        insert_rows(rows)
 
-        #if errors:
-        #    print(item)
-        #    print("errors: " + str(errors))
+        # Debug
+        if item['error']:
+            print(item['error'])
 
-        if spider.settings['PRINT']:
+        elif spider.settings['PRINT']:
             print(item)
 
         return item
-

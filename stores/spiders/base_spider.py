@@ -36,24 +36,24 @@ class BaseSpider(scrapy.Spider):
     #### PARSE ####
     def parse(self, response):
         results = [] if response.status != 200 else parse_store(response)
-        row = self.create_row(results, response)
+        item = self.create_item(results, response)
 
-        return row
+        return item
 
-    def create_row(self, results, response):
-        row = {}
-        row["store"] = self.name
-        row["date"] = time.strftime("%Y-%m-%d")
-        row['title'] = response.xpath("//title/text()").extract_first()
-        row["url"] = response.url
-        row["timestamp"] = int(time.time())
-        row['error'] = response.body.decode() if response.status != 200 else None
+    def create_item(self, results, response):
+        item = {}
+        item["store"] = self.name
+        item['title'] = response.xpath("//title/text()").extract_first()
+        item["url"] = response.url
+        item["date"] = time.strftime("%Y-%m-%d")
+        item["timestamp"] = int(time.time())
+        item['error'] = response.body.decode() if response.status != 200 else None
 
         #Convert items to dicts
         if results:
             for i, item in enumerate(results):
                 results[i] = dict(item)
 
-        row.update(results)
+        item.update(results)
 
-        return row
+        return item
