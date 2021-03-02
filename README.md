@@ -6,7 +6,7 @@ A project using scrapy to crawl the address of Aldi's and Leclerc's stores.
 ### Python
 Download and install python3.9 from https://www.python.org/downloads/.
 
-In the root folder run:
+In root folder run:
 ```
 sudo apt-get install libmysqlclient-dev
 pip install -r requirements.txt
@@ -27,9 +27,9 @@ scrapy crawl <spider>
 ```
 
 ### Arguments
-- `-c`, `--csv` : Export to a csv file
-- `-p`, `--print` : Print results
-- `-s`, `--spiders` : conccurent spiders (default: 2)
+- `-c`, `--csv` : Export to a csv file.
+- `-p`, `--print` : Print results.
+- `-s`, `--spiders` : conccurent spiders (default: 2).
 
 ### Environnement variables
-- `CONNECTION` : MySQL database connection string 
+- `CONNECTION` : MySQL database connection string.
