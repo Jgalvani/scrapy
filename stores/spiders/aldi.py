@@ -10,13 +10,14 @@ from stores.items import StoresItem
 
 class AldiSpider(BaseSpider):
     name = 'aldi'
-    url = 'https://www.yellowmap.de/partners/AldiNord/Html/Poi.aspx?SessionGuid=effc178a-0801-445b-9912-99e48144765f&View=4&ClearGroups=MapNav,GeoMap&Page={}&ClearParas=PoiListPageSize&Step='
+    url = 'https://www.yellowmap.de/partners/AldiNord/Html/Poi.aspx?SessionGuid={}&View=4&ClearGroups=MapNav,GeoMap&Page={}&ClearParas=PoiListPageSize&Step='
     store_per_page = 5
+    session = 'effc178a-0801-445b-9912-99e48144765f' #To update
 
 
     def start_requests(self):
 
-        url = self.url.format(1)
+        url = self.url.format(session, 1)
         request = requests.get(url)
 
         parser = BeautifulSoup(request.text, 'html.parser')
@@ -29,7 +30,7 @@ class AldiSpider(BaseSpider):
 
         for i in range(2, page_count + 1):
             r = scrapy.Request(
-                url=self.url.format(i),
+                url=self.url.format(session, i),
                 callback=self.parse,
                 dont_filter=True,
             )
