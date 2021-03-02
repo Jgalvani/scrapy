@@ -13,23 +13,21 @@ pip install -r requirements.txt
 ```
 
 ## USAGE
-
 In root folder:
-
-### All spiders
 ```
 python3 run.py
-```
-
-### One spider
-```
-scrapy crawl <spider>
 ```
 
 ### Arguments
 - `-c`, `--csv` : Export to a csv file.
 - `-p`, `--print` : Print results.
 - `-s`, `--spiders` : conccurent spiders (default: 2).
+
+### One spider
+In root folder:
+```
+scrapy crawl <spider>
+```
 
 ### Environnement variables
 - `CONNECTION` : MySQL database connection string.
